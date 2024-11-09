@@ -1,0 +1,39 @@
+- addressable_lambda:
+    name: "Stufenlicht rauf colorized"
+    update_interval: ${update_intervall}
+    lambda: |-
+      static int last_reset = 0;
+      int von = 0;
+
+      if (last_reset == 0 || (millis() - last_reset) >= (id(stufen_anzahl) * id(schritt_intervall))) {
+        last_reset = millis();
+      }
+
+      uint16_t progress = ((millis() - last_reset) / id(schritt_intervall)) % id(stufen_anzahl);
+
+      for (int stufe = 0; stufe < id(stufen_anzahl); stufe++) {
+        if (stufe == progress) {
+          it.range(von, von + id(led_stufen)[stufe]) = id(led_stufenfarbe)[stufe];
+        }
+        von += id(led_stufen)[stufe];
+      }
+
+- addressable_lambda:
+    name: "Stufenlicht runter colorized"
+    update_interval: ${update_intervall}
+    lambda: |-
+      static int last_reset = 0;
+      int von = 0;
+
+      if (last_reset == 0 || (millis() - last_reset) >= (id(stufen_anzahl) * id(schritt_intervall))) {
+        last_reset = millis();
+      }
+
+      uint16_t progress = id(stufen_anzahl) - 1 - (((millis() - last_reset) / id(schritt_intervall)) % id(stufen_anzahl));
+
+      for (int stufe = 0; stufe < id(stufen_anzahl); stufe++) {
+        if (stufe == progress) {
+          it.range(von, von + id(led_stufen)[stufe]) = id(led_stufenfarbe)[stufe];
+        }
+        von += id(led_stufen)[stufe];
+      }

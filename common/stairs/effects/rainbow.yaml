@@ -1,0 +1,4 @@
+- addressable_rainbow:
+    name: Rainbow
+    speed: 10
+    width: 90

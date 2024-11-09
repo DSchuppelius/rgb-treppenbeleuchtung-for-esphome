@@ -1,0 +1,244 @@
+esphome:
+  on_boot:
+    priority: -100
+    then:
+      - script.execute: rgbtreppe_initialisieren
+      - switch.turn_on: rgbtreppe_switch
+
+substitutions:
+  # ------------------
+  #   Pin-Belegung
+  # ------------------
+  lightlevel_pin:            A0
+  pir_down_pin:              D5
+  pir_up_pin:                D7
+  led_pin:                   D6
+
+  statusled_pir_up_pin:      D1
+  statusled_pir_down_pin:    D2
+  statusled_light_pin:       D8
+
+  # ------------------
+  #    LED Timings
+  # ------------------
+  # Gibt die Zeit an, nach der die Treppe sich automatisch wieder ausschaltet, 
+  # wenn bis dahin keine Bewegung am anderen Ende erkannt wurde.
+  timeout_seconds:           20s
+
+  # Gibt an, wie lange die Abschaltung verzögert werden soll, 
+  # nach dem eine Bewegung am Ziel der Treppe erkannt wurde.
+  switchoff_delay_seconds:   5s
+
+  # Gibt an, wie lange die Treppe nach abschalten der LEDs deaktiviert sein soll,
+  # Bevor sie durch Bewegung wieder ausgelöst werden kann.
+  cooldown_seconds:          5s
+
+  # ------------------------
+  #   Effekt-Einstellungen
+  # ------------------------
+
+  # Folgende Effekte stehen zur Verfügung:
+  #
+  # Rainbow
+  # Color Wipe Up
+  # Color Wipe Down
+  # Rocket
+  # Firework
+  # Stufenlicht rauf
+  # Stufenlicht rauf animiert
+  # Stufenlicht rauf colorized
+  # Stufenlicht rauf weiss
+  # Stufenlicht rauf aus
+  # Stufenlicht runter
+  # Stufenlicht runter animiert
+  # Stufenlicht runter colorized
+  # Stufenlicht runter weiss
+  # Stufenlicht runter aus
+
+  # Effekt-Name für das einschalten der Treppe von unten nach oben.
+  led_effect_up:             "Color Wipe Up"
+
+  # Effekt-Name für das einschalten der Treppe von oben nach unten.
+  led_effect_down:           "Color Wipe Down"
+
+  # Effekt-Name für das abschalten der Treppe von unten nach oben.
+  # Wird kein Effektname angegeben, werden die LEDs nur ausgeschaltet.
+  led_effect_up_off:         ""
+
+  # Effekt-Name für das abschalten der Treppe von oben nach unten.
+  # Wird kein Effektname angegeben, werden die LEDs nur ausgeschaltet.
+  led_effect_down_off:       ""
+  led_effect_off_timeout:    10s
+
+  # Gibt an, wie viele LEDs je Stufe existieren
+  leds_pro_stufe:            "{10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10}"
+
+  # Gibt die Farbe je Stufe an (für "Colorized" Animation)
+  # (Anzahl der Zahlenwerte muss mit der Anzahl des Arrays "leds_pro_stufe" übereinstimmen)
+  farbe_je_stufe:            "Color(255,0,0); Color(0,255,0); Color(255,0,0); Color(0,255,0); Color(255,0,0); Color(0,0,255); Color(255,0,0); Color(0,0,255); Color(255,0,0); Color(255,255,0); Color(255,0,0); Color(255,255,0); Color(255,0,0); Color(0,255,0); Color(255,0,0), Color(255,0,0); Color(0,255,0); Color(255,0,0); Color(0,255,0); Color(255,0,0); Color(0,0,255); Color(255,0,0); Color(0,0,255); Color(255,0,0); Color(255,255,0); Color(255,0,0); Color(255,255,0); Color(255,0,0); Color(0,255,0); Color(255,0,0)"
+
+  # Schrittintervall pro Stufe in ms
+  schritt_intervall:         "250"
+
+  # Updateintervall für Effekte (update_intervall <= 1/4 * schritt_intervall)
+  update_intervall:          "50ms"
+
+  # Anzahl der LEDs muss der Gesamtmenge des Arrays "leds_pro_stufe" entsprechen
+  led_anzahl:                "300"
+
+  # ------------------
+  #      System
+  # ------------------
+  # Gibt an, ob die Treppe anhand des Lichtsensors ein/ausgeschaltet werden soll
+  # Da der Fotowiderstand bei Dunkelheit weniger Strom durchlässt,
+  # ist die Treppe bei aktiviertem Lichtsensor nur aktiv,
+  # wenn der Sensorwert unter dem "lightlevel_maxvalue" Wert liegt.
+  light_sensor_active:       "true"
+  lightlevel_maxvalue:       "0.5"
+
+  # Gibt an, ob die Treppe anhand des Sonnenstandes automatisch ein/ausgeschaltet werden soll.
+  # Wenn aktiv (true) ist schaltet sich die Treppe nur nach Sonnenuntergang ein.
+  sun_active:                "false"
+
+  # Höhen/Breitengrad für Sonnenstandsermittlung
+  latitude:                  "50.35347°"
+  longitude:                 "7.64325°"
+
+globals:
+  - id: treppe_rauf_laeuft
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+
+  - id: treppe_runter_laeuft
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+
+  - id: schritt_intervall
+    type: int
+    restore_value: no
+    initial_value: ${schritt_intervall}
+
+  - id: current_effect
+    type: std::string
+    restore_value: no
+    initial_value: ""
+
+  - id: current_pir_sensor
+    type: binary_sensor::BinarySensor*
+    restore_value: no
+    initial_value: 'nullptr'
+
+  - id: current_effect_off
+    type: std::string
+    restore_value: no
+    initial_value: ""
+
+  - id: stufen_anzahl
+    type: int
+    restore_value: no
+    initial_value: '0'
+
+  - id: led_anzahl
+    type: int
+    restore_value: no
+    initial_value: '0'
+
+  - id: led_stufen
+    type: std::vector<int>
+    restore_value: False
+
+  - id: led_stufenfarbe
+    type: std::vector<Color>
+    restore_value: False
+
+sun:
+  id: sun_id
+  latitude: ${latitude}
+  longitude: ${longitude}
+
+wifi:
+  id: wifi_id
+
+time:
+  - platform: homeassistant
+    id: local_time
+  - platform: sntp
+    id: sntp_time
+
+script: !include script.yaml
+
+sensor:
+  - platform: adc
+    pin: ${lightlevel_pin}
+    name: "RGB-Treppe Helligkeitssensor"
+    update_interval: 30s
+    id: rgbtreppe_helligkeitssensor
+
+  - platform: wifi_signal
+    name: "WiFi Signalstärke"
+    update_interval: 60s
+
+  - platform: uptime
+    name: "Systemlaufzeit"
+    update_interval: 60s
+
+  - platform: template
+    name: "Freier Speicher"
+    id: free_memory
+    lambda: |-
+      return ESP.getFreeHeap();
+    update_interval: 60s
+
+binary_sensor:
+  - platform: gpio
+    pin: ${pir_down_pin}
+    name: "RGB-Treppe Bewegungsmelder unten"
+    device_class: motion
+    id: rgbtreppe_pir_u
+    on_press:
+      then:
+        - script.execute: treppe_rauf_aktivieren
+
+  - platform: gpio
+    pin: ${pir_up_pin}
+    name: "RGB-Treppe Bewegungsmelder oben"
+    device_class: motion
+    id: rgbtreppe_pir_o
+    on_press:
+      then:
+        - script.execute: treppe_runter_aktivieren
+
+switch:
+  - platform: gpio
+    pin: ${statusled_pir_up_pin}
+    name: "RGB-Treppe PIR oben Status LED"
+    id: rgbtreppe_pir_status_o
+
+  - platform: gpio
+    pin: ${statusled_pir_down_pin}
+    name: "RGB-Treppe PIR unten Status LED"
+    id: rgbtreppe_pir_status_u
+
+  - platform: gpio
+    pin: ${statusled_light_pin}
+    name: "RGB-Treppe Helligkeit Status LED"
+    id: rgbtreppe_hell_status
+
+  - platform: template
+    name: "RGB-Treppe aktiv"
+    id: rgbtreppe_switch
+    optimistic: true
+
+light:
+  - platform: neopixelbus
+    variant: WS2812
+    pin: ${led_pin}
+    num_leds: ${led_anzahl}
+    default_transition_length: 3s
+    type: GRB
+    name: "RGB-Treppe Licht"
+    id: rgbtreppe_light
+    restore_mode: ALWAYS_OFF
+    effects: !include_dir_merge_list effects

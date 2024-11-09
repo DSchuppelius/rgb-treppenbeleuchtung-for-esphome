@@ -1,0 +1,83 @@
+- id: rgbtreppe_initialisieren
+  then:
+      - lambda: |-
+          std::vector<int> ledStufen = {${leds_pro_stufe}};
+          std::vector<Color> farben = {${farbe_je_stufe}};
+
+          id(stufen_anzahl) = ledStufen.size();
+
+          id(led_stufen) = ledStufen;
+          id(led_stufenfarbe) = farben;
+
+- id: treppe_rauf_aktivieren
+  mode: restart
+  then:
+    - if:
+        condition:
+          - switch.is_on: rgbtreppe_switch
+          - lambda: |-
+              bool light_sensor_check = id(rgbtreppe_helligkeitssensor).state < ${lightlevel_maxvalue} || ${light_sensor_active} == false;
+              bool treppe_nicht_aktiv = !id(treppe_rauf_laeuft) && !id(treppe_runter_laeuft);
+              return light_sensor_check && treppe_nicht_aktiv;
+          - or:
+              - sun.is_below_horizon:
+              - lambda: 'return ${sun_active} == false;'
+        then:
+          - lambda: |-
+              id(treppe_rauf_laeuft) = true;
+              id(current_effect) = "${led_effect_up}";
+              id(current_pir_sensor) = id(rgbtreppe_pir_o);
+              id(current_effect_off) = "${led_effect_up_off}";
+          - script.execute: treppe_effekte_ausfuehren
+
+- id: treppe_runter_aktivieren
+  mode: restart
+  then:
+    - if:
+        condition:
+          - switch.is_on: rgbtreppe_switch
+          - lambda: |-
+              bool light_sensor_check = id(rgbtreppe_helligkeitssensor).state < ${lightlevel_maxvalue} || ${light_sensor_active} == false;
+              bool treppe_nicht_aktiv = !id(treppe_rauf_laeuft) && !id(treppe_runter_laeuft);
+              return light_sensor_check && treppe_nicht_aktiv;
+          - or:
+              - sun.is_below_horizon:
+              - lambda: 'return ${sun_active} == false;'
+        then:
+          - lambda: |-
+              id(treppe_runter_laeuft) = true;
+              id(current_effect) = "${led_effect_down}";
+              id(current_pir_sensor) = id(rgbtreppe_pir_u);
+              id(current_effect_off) = "${led_effect_down_off}";
+          - script.execute: treppe_effekte_ausfuehren
+
+- id: treppe_effekte_ausfuehren
+  then:
+    - light.turn_on:
+        id: rgbtreppe_light
+        effect: !lambda 'return id(current_effect);'
+    - wait_until:
+        timeout: ${timeout_seconds}
+        condition:
+          lambda: |-
+            return id(current_pir_sensor)->state == true;
+    - script.execute: treppe_deaktivieren
+
+- id: treppe_deaktivieren
+  mode: restart
+  then:
+    - delay: ${switchoff_delay_seconds}
+    - if:
+        condition:
+          lambda: 'return id(current_effect_off) != "";'
+        then:
+          - light.turn_on:
+              id: rgbtreppe_light
+              effect: !lambda 'return id(current_effect_off);'
+          - delay: ${led_effect_off_timeout}
+    - light.turn_off:
+        id: rgbtreppe_light
+    - delay: ${cooldown_seconds}
+    - lambda: |-
+        id(treppe_rauf_laeuft) = false;
+        id(treppe_runter_laeuft) = false;

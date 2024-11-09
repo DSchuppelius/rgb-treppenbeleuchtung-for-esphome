@@ -1,0 +1,6 @@
+- addressable_fireworks:
+    name: Firework
+    update_interval: 32ms
+    spark_probability: 40%
+    use_random_color: true
+    fade_out_rate: 120

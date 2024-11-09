@@ -1,0 +1,57 @@
+- addressable_color_wipe:
+    name: Rocket
+    colors:
+      - red: 100%
+        green: 0%
+        blue: 0%
+        num_leds: 3
+      - red: 100%
+        green: 100%
+        blue: 100%
+        num_leds: 2
+      - red: 100%
+        green: 0%
+        blue: 0%
+        num_leds: 3
+      - red: 100%
+        green: 100%
+        blue: 100%
+        num_leds: 2
+      - red: 10%
+        green: 5%
+        blue: 2%
+        num_leds: 1
+      - red: 30%
+        green: 15%
+        blue: 6%
+        num_leds: 1
+      - red: 70%
+        green: 30%
+        blue: 10%
+        num_leds: 1
+      - red: 100%
+        green: 80%
+        blue: 20%
+        num_leds: 1
+      - red: 100%
+        green: 40%
+        blue: 10%
+        num_leds: 1
+      - red: 10%
+        green: 5%
+        blue: 1%
+        num_leds: 1
+      - red: 0%
+        green: 0%
+        blue: 0%
+        num_leds: 1
+      - red: 10%
+        green: 5%
+        blue: 1%
+        num_leds: 1
+      - red: 0%
+        green: 0%
+        blue: 0%
+        num_leds: ${led_anzahl}
+    add_led_interval: 20ms
+    reverse: true

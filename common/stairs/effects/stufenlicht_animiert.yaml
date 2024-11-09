@@ -1,0 +1,67 @@
+# Beim animierten Effekt wird jede Stufe einzeln in einer Zufalls-Farbe eingeschaltet.  (Laufrichtung von Stripe-Start nach Stripe-Ende)
+# Sobald alle Stufen aktiv sind, wird bei der ersten Stufe wieder mit einer neuen Zufalls-Farbe angefangen.
+#
+# - anzahl             -  muss auf die Anzahl der Stufen angepasst werden
+# - ledStufe[anzahl]   -  ist ein Array, welches für jede Stufe die jeweilige Anzahl der LEDs beinhaltet.
+#                         Die Anzahl der in ledStufe enthaltenen Einträge muss der Anzahl der Stufen entsprechen!
+- addressable_lambda:
+    name: "Stufenlicht rauf animiert"
+    update_interval: ${update_intervall}
+    lambda: |-
+      static int last_reset = 0;
+      int von = 0;
+      static std::vector<bool> stufen_belichtet;
+
+      if (stufen_belichtet.empty() || initial_run) {
+        stufen_belichtet = std::vector<bool>(id(stufen_anzahl), false);
+      }
+
+      if (last_reset == 0 || (millis() - last_reset) >= (id(stufen_anzahl) * id(schritt_intervall))) {
+        last_reset = millis();
+      }
+
+      uint16_t progress = ((millis() - last_reset) / id(schritt_intervall)) % id(stufen_anzahl);
+
+      for (int stufe = 0; stufe < id(stufen_anzahl); stufe++) {
+        if (stufe == progress && !stufen_belichtet[stufe]) {
+          it.range(von, von + id(led_stufen)[stufe]) = Color::random_color();
+          stufen_belichtet[stufe] = true;
+        }else if (std::all_of(stufen_belichtet.begin(), stufen_belichtet.end(), [](bool b){ return b; })) {
+          stufen_belichtet.clear();
+        }
+        von += id(led_stufen)[stufe];
+      }
+
+# Beim animierten Effekt wird jede Stufe einzeln in einer Zufalls-Farbe eingeschaltet.  (Laufrichtung von Stripe-Ende nach Stripe-Start)
+# Sobald alle Stufen aktiv sind, wird bei der ersten Stufe wieder mit einer neuen Zufalls-Farbe angefangen.
+#
+# - anzahl             -  muss auf die Anzahl der Stufen angepasst werden
+# - ledStufe[anzahl]   -  ist ein Array, welches für jede Stufe die jeweilige Anzahl der LEDs beinhaltet.
+#                         Die Anzahl der in ledStufe enthaltenen Einträge muss der Anzahl der Stufen entsprechen!
+- addressable_lambda:
+    name: "Stufenlicht runter animiert"
+    update_interval: ${update_intervall}
+    lambda: |-
+      static int last_reset = 0;
+      int von = 0;
+      static std::vector<bool> stufen_belichtet;
+
+      if (stufen_belichtet.empty() || initial_run) {
+        stufen_belichtet = std::vector<bool>(id(stufen_anzahl), false);
+      }
+
+      if (last_reset == 0 || (millis() - last_reset) >= (id(stufen_anzahl) * id(schritt_intervall))) {
+        last_reset = millis();
+      }
+
+      int16_t progress = id(stufen_anzahl) - 1 - (((millis() - last_reset) / id(schritt_intervall)) % (id(stufen_anzahl) + 1));
+
+      for (int stufe = 0; stufe < id(stufen_anzahl); stufe++) {
+        if (stufe == progress && !stufen_belichtet[stufe]) {
+          it.range(von, von + id(led_stufen)[stufe]) = Color::random_color();
+          stufen_belichtet[stufe] = true;
+        }else if (std::all_of(stufen_belichtet.begin(), stufen_belichtet.end(), [](bool b){ return b; })) {
+          stufen_belichtet.clear();
+        }
+        von += id(led_stufen)[stufe];
+      }
