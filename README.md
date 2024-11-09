@@ -18,7 +18,7 @@ Eine ausführliche Anleitung des Projektes findet Ihr unter:
 
 ### Anmerkung
 
-Dieser Fork ist entstanden, weil mir der urspüngliche Code immer abgeschmiert ist. Hauptursache ist meines Erachtens die Verwendung der Delay-Funktion gewesen, welche bei einem entsprechend langen LED-Streifen dafür sorgte, dass das Programm vorzeitig beendet wurde bzw. der Controller jedes mal neustartete.
+Dieser Fork ist entstanden, weil mir der urspüngliche Code immer abgeschmiert ist und ich denke, dass sich dieses Projekt hervorragend als Package macht. Hauptursache ist meines Erachtens die Verwendung der Delay-Funktion gewesen, welche bei einem entsprechend langen LED-Streifen dafür sorgte, dass das Programm vorzeitig beendet wurde bzw. der Controller jedes mal neustartete.
 
 ## Verwendete Bauteile
 
