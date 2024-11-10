@@ -2,7 +2,7 @@
 # Sobald alle Stufen aktiv sind, wird bei der ersten Stufe wieder mit einer neuen Zufalls-Farbe angefangen.
 - addressable_lambda:
     name: "Stufenlicht rauf animiert"
-    update_interval: ${update_intervall}
+    update_interval: ${schritt_intervall}ms
     lambda: |-
       static int last_reset = 0;
       int von = 0;
@@ -22,6 +22,7 @@
         if (stufe == progress && !stufen_beleuchtet[stufe]) {
           stufen_beleuchtet[stufe] = true;
           it.range(von, von + id(led_stufen)[stufe]) = Color::random_color();
+          ESP_LOGI("Stufenlicht", "Stufe %d beleuchtet", progress);
         }
         von += id(led_stufen)[stufe];
       }
@@ -34,7 +35,7 @@
 # Sobald alle Stufen aktiv sind, wird bei der ersten Stufe wieder mit einer neuen Zufalls-Farbe angefangen.
 - addressable_lambda:
     name: "Stufenlicht runter animiert"
-    update_interval: ${update_intervall}
+    update_interval: ${schritt_intervall}ms
     lambda: |-
       static int last_reset = 0;
       int von = 0;
@@ -54,6 +55,7 @@
         if (stufe == progress && !stufen_beleuchtet[stufe]) {
           stufen_beleuchtet[stufe] = true;
           it.range(von, von + id(led_stufen)[stufe]) = Color::random_color();
+          ESP_LOGI("Stufenlicht", "Stufe %d beleuchtet", progress);
         }
         von += id(led_stufen)[stufe];
       }
