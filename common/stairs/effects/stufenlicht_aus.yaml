@@ -1,8 +1,4 @@
 # Bei diesem Effekt wird jede Stufe einzeln ausgeschaltet. (Laufrichtung von Stripe-Start nach Stripe-Ende)
-#
-# - anzahl             -  muss auf die Anzahl der Stufen angepasst werden
-# - ledStufe[anzahl]   -  ist ein Array, welches für jede Stufe die jeweilige Anzahl der LEDs beinhaltet.
-#                         Die Anzahl der in ledStufe enthaltenen Einträge muss der Anzahl der Stufen entsprechen!
 - addressable_lambda:
     name: "Stufenlicht rauf aus"
     update_interval: ${update_intervall}
@@ -24,10 +20,6 @@
       }
 
 # Bei diesem Effekt wird jede Stufe einzeln ausgeschaltet. (Laufrichtung von Stripe-Ende nach Stripe-Start)
-#
-# - anzahl             -  muss auf die Anzahl der Stufen angepasst werden
-# - ledStufe[anzahl]   -  ist ein Array, welches für jede Stufe die jeweilige Anzahl der LEDs beinhaltet.
-#                         Die Anzahl der in ledStufe enthaltenen Einträge muss der Anzahl der Stufen entsprechen!
 - addressable_lambda:
     name: "Stufenlicht runter aus"
     update_interval: ${update_intervall}
