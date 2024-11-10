@@ -2,7 +2,7 @@
 # In diesem Effekt behalten die Stufen bis zum abschalten ihre Farbe.
 - addressable_lambda:
     name: "Stufenlicht rauf"
-    update_interval: ${update_intervall}
+    update_interval: ${schritt_intervall}ms
     lambda: |-
       static int last_reset = 0;
       int von = 0;
@@ -30,7 +30,7 @@
 # In diesem Effekt behalten die Stufen bis zum abschalten ihre Farbe.
 - addressable_lambda:
     name: "Stufenlicht runter"
-    update_interval: ${update_intervall}
+    update_interval: ${schritt_intervall}ms
     lambda: |-
       static int last_reset = 0;
       int von = 0;
