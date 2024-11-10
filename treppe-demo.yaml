@@ -461,20 +461,16 @@ light:
 
       # Bei diesem Effekt wird jede Stufe einzeln in einer Zufalls-Farbe eingeschaltet. (Laufrichtung von Stripe-Start nach Stripe-Ende)
       # In diesem Effekt behalten die Stufen bis zum abschalten ihre Farbe.
-      #
-      # - anzahl             -  muss auf die Anzahl der Stufen angepasst werden
-      # - ledStufe[anzahl]   -  ist ein Array, welches für jede Stufe die jeweilige Anzahl der LEDs beinhaltet.
-      #                         Die Anzahl der in ledStufe enthaltenen Einträge muss der Anzahl der Stufen entsprechen!
       - addressable_lambda:
           name: "Stufenlicht rauf"
-          update_interval: ${update_intervall}
+          update_interval: ${schritt_intervall}ms
           lambda: |-
             static int last_reset = 0;
             int von = 0;
-            static std::vector<bool> stufen_belichtet;
+            static std::vector<bool> stufen_beleuchtet;
 
-            if (stufen_belichtet.empty() || initial_run) {
-              stufen_belichtet = std::vector<bool>(id(stufen_anzahl), false);
+            if (stufen_beleuchtet.empty() || initial_run) {
+              stufen_beleuchtet = std::vector<bool>(id(stufen_anzahl), false);
             }
 
             if (last_reset == 0 || (millis() - last_reset) >= (id(stufen_anzahl) * id(schritt_intervall))) {
@@ -484,29 +480,25 @@ light:
             uint16_t progress = ((millis() - last_reset) / id(schritt_intervall)) % id(stufen_anzahl);
 
             for (int stufe = 0; stufe < id(stufen_anzahl); stufe++) {
-              if (stufe == progress && !stufen_belichtet[stufe]) {
+              if (stufe == progress && !stufen_beleuchtet[stufe]) {
+                stufen_beleuchtet[stufe] = true;
                 it.range(von, von + id(led_stufen)[stufe]) = Color::random_color();
-                stufen_belichtet[stufe] = true;
               }
               von += id(led_stufen)[stufe];
             }
 
       # Beim animierten Effekt wird jede Stufe einzeln in einer Zufalls-Farbe eingeschaltet.  (Laufrichtung von Stripe-Start nach Stripe-Ende)
       # Sobald alle Stufen aktiv sind, wird bei der ersten Stufe wieder mit einer neuen Zufalls-Farbe angefangen.
-      #
-      # - anzahl             -  muss auf die Anzahl der Stufen angepasst werden
-      # - ledStufe[anzahl]   -  ist ein Array, welches für jede Stufe die jeweilige Anzahl der LEDs beinhaltet.
-      #                         Die Anzahl der in ledStufe enthaltenen Einträge muss der Anzahl der Stufen entsprechen!
       - addressable_lambda:
           name: "Stufenlicht rauf animiert"
-          update_interval: ${update_intervall}
+          update_interval: ${schritt_intervall}ms
           lambda: |-
             static int last_reset = 0;
             int von = 0;
-            static std::vector<bool> stufen_belichtet;
+            static std::vector<bool> stufen_beleuchtet;
 
-            if (stufen_belichtet.empty() || initial_run) {
-              stufen_belichtet = std::vector<bool>(id(stufen_anzahl), false);
+            if (stufen_beleuchtet.empty() || initial_run) {
+              stufen_beleuchtet = std::vector<bool>(id(stufen_anzahl), false);
             }
 
             if (last_reset == 0 || (millis() - last_reset) >= (id(stufen_anzahl) * id(schritt_intervall))) {
@@ -516,14 +508,18 @@ light:
             uint16_t progress = ((millis() - last_reset) / id(schritt_intervall)) % id(stufen_anzahl);
 
             for (int stufe = 0; stufe < id(stufen_anzahl); stufe++) {
-              if (stufe == progress && !stufen_belichtet[stufe]) {
+              if (stufe == progress && !stufen_beleuchtet[stufe]) {
+                stufen_beleuchtet[stufe] = true;
                 it.range(von, von + id(led_stufen)[stufe]) = Color::random_color();
-                stufen_belichtet[stufe] = true;
-              }else if (std::all_of(stufen_belichtet.begin(), stufen_belichtet.end(), [](bool b){ return b; })) {
-                stufen_belichtet.clear();
+                ESP_LOGI("Stufenlicht", "Stufe %d beleuchtet", progress);
               }
               von += id(led_stufen)[stufe];
             }
+
+            if (std::all_of(stufen_beleuchtet.begin(), stufen_beleuchtet.end(), [](bool b){ return b; })) {
+              stufen_beleuchtet.clear();
+            }
+
 
       # Beim colorized Effekt wird jede Stufe einzeln in einer Festgelegten-Farbe eingeschaltet.  (Laufrichtung von Stripe-Start nach Stripe-Ende)
       # Die Farbauswahl kann für jede Stufe individuell erfolgen
@@ -607,20 +603,16 @@ light:
 
       # Bei diesem Effekt wird jede Stufe einzeln in einer Zufalls-Farbe eingeschaltet. (Laufrichtung von Stripe-Ende nach Stripe-Start)
       # In diesem Effekt behalten die Stufen bis zum abschalten ihre Farbe.
-      #
-      # - anzahl             -  muss auf die Anzahl der Stufen angepasst werden
-      # - ledStufe[anzahl]   -  ist ein Array, welches für jede Stufe die jeweilige Anzahl der LEDs beinhaltet.
-      #                         Die Anzahl der in ledStufe enthaltenen Einträge muss der Anzahl der Stufen entsprechen!
       - addressable_lambda:
           name: "Stufenlicht runter"
-          update_interval: ${update_intervall}
+          update_interval: ${schritt_intervall}ms
           lambda: |-
             static int last_reset = 0;
             int von = 0;
-            static std::vector<bool> stufen_belichtet;
+            static std::vector<bool> stufen_beleuchtet;
 
-            if (stufen_belichtet.empty() || initial_run) {
-              stufen_belichtet = std::vector<bool>(id(stufen_anzahl), false);
+            if (stufen_beleuchtet.empty() || initial_run) {
+              stufen_beleuchtet = std::vector<bool>(id(stufen_anzahl), false);
             }
 
             if (last_reset == 0 || (millis() - last_reset) >= (id(stufen_anzahl) * id(schritt_intervall))) {
@@ -630,29 +622,25 @@ light:
             int16_t progress = id(stufen_anzahl) - 1 - (((millis() - last_reset) / id(schritt_intervall)) % (id(stufen_anzahl) + 1));
 
             for (int stufe = 0; stufe < id(stufen_anzahl); stufe++) {
-              if (stufe == progress && !stufen_belichtet[stufe]) {
+              if (stufe == progress && !stufen_beleuchtet[stufe]) {
+                stufen_beleuchtet[stufe] = true;
                 it.range(von, von + id(led_stufen)[stufe]) = Color::random_color();
-                stufen_belichtet[stufe] = true;
               }
               von += id(led_stufen)[stufe];
             }
 
       # Beim animierten Effekt wird jede Stufe einzeln in einer Zufalls-Farbe eingeschaltet.  (Laufrichtung von Stripe-Ende nach Stripe-Start)
       # Sobald alle Stufen aktiv sind, wird bei der ersten Stufe wieder mit einer neuen Zufalls-Farbe angefangen.
-      #
-      # - anzahl             -  muss auf die Anzahl der Stufen angepasst werden
-      # - ledStufe[anzahl]   -  ist ein Array, welches für jede Stufe die jeweilige Anzahl der LEDs beinhaltet.
-      #                         Die Anzahl der in ledStufe enthaltenen Einträge muss der Anzahl der Stufen entsprechen!
       - addressable_lambda:
           name: "Stufenlicht runter animiert"
-          update_interval: ${update_intervall}
+          update_interval: ${schritt_intervall}ms
           lambda: |-
             static int last_reset = 0;
             int von = 0;
-            static std::vector<bool> stufen_belichtet;
+            static std::vector<bool> stufen_beleuchtet;
 
-            if (stufen_belichtet.empty() || initial_run) {
-              stufen_belichtet = std::vector<bool>(id(stufen_anzahl), false);
+            if (stufen_beleuchtet.empty() || initial_run) {
+              stufen_beleuchtet = std::vector<bool>(id(stufen_anzahl), false);
             }
 
             if (last_reset == 0 || (millis() - last_reset) >= (id(stufen_anzahl) * id(schritt_intervall))) {
@@ -662,13 +650,16 @@ light:
             int16_t progress = id(stufen_anzahl) - 1 - (((millis() - last_reset) / id(schritt_intervall)) % (id(stufen_anzahl) + 1));
 
             for (int stufe = 0; stufe < id(stufen_anzahl); stufe++) {
-              if (stufe == progress && !stufen_belichtet[stufe]) {
+              if (stufe == progress && !stufen_beleuchtet[stufe]) {
+                stufen_beleuchtet[stufe] = true;
                 it.range(von, von + id(led_stufen)[stufe]) = Color::random_color();
-                stufen_belichtet[stufe] = true;
-              }else if (std::all_of(stufen_belichtet.begin(), stufen_belichtet.end(), [](bool b){ return b; })) {
-                stufen_belichtet.clear();
+                ESP_LOGI("Stufenlicht", "Stufe %d beleuchtet", progress);
               }
               von += id(led_stufen)[stufe];
+            }
+
+            if (std::all_of(stufen_beleuchtet.begin(), stufen_beleuchtet.end(), [](bool b){ return b; })) {
+              stufen_beleuchtet.clear();
             }
 
       # Beim colorized Effekt wird jede Stufe einzeln in einer Festgelegten-Farbe eingeschaltet.  (Laufrichtung von Stripe-Ende nach Stripe-Start)
