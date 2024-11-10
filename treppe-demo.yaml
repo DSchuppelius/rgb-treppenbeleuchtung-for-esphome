@@ -511,7 +511,6 @@ light:
               if (stufe == progress && !stufen_beleuchtet[stufe]) {
                 stufen_beleuchtet[stufe] = true;
                 it.range(von, von + id(led_stufen)[stufe]) = Color::random_color();
-                ESP_LOGI("Stufenlicht", "Stufe %d beleuchtet", progress);
               }
               von += id(led_stufen)[stufe];
             }
@@ -523,14 +522,6 @@ light:
 
       # Beim colorized Effekt wird jede Stufe einzeln in einer Festgelegten-Farbe eingeschaltet.  (Laufrichtung von Stripe-Start nach Stripe-Ende)
       # Die Farbauswahl kann für jede Stufe individuell erfolgen
-      #
-      # - anzahl                  -  muss auf die Anzahl der Stufen angepasst werden
-      # - ledStufe[anzahl]        -  ist ein Array, welches für jede Stufe die jeweilige Anzahl der LEDs beinhaltet.
-      #                              Die Anzahl der in ledStufe enthaltenen Einträge muss der Anzahl der Stufen entsprechen!
-      # - ledStufenFarbe[anzahl]  -  ist ein Array, welches für jede Stufe die jeweilige Farbe beinhaltet.
-      #                              Die Anzahl der in ledStufenFarbe enthaltenen Einträge muss der Anzahl der Stufen entsprechen!
-      #                              Die Farben sind in der Form "Color(rot, grün, blau)" anzugeben,
-      #                              wobei hier für rot, grün und blau jeweils eine Zahl zwischen 0 und 255 angegeben werden muss.
       - addressable_lambda:
           name: "Stufenlicht rauf colorized"
           update_interval: ${update_intervall}
@@ -552,10 +543,6 @@ light:
             }
 
       # Bei diesem Effekt wird jede Stufe einzeln weiss geschaltet. (Laufrichtung von Stripe-Start nach Stripe-Ende)
-      #
-      # - anzahl             -  muss auf die Anzahl der Stufen angepasst werden
-      # - ledStufe[anzahl]   -  ist ein Array, welches für jede Stufe die jeweilige Anzahl der LEDs beinhaltet.
-      #                         Die Anzahl der in ledStufe enthaltenen Einträge muss der Anzahl der Stufen entsprechen!
       - addressable_lambda:
           name: "Stufenlicht rauf weiss"
           update_interval: ${update_intervall}
@@ -577,10 +564,6 @@ light:
             }
 
       # Bei diesem Effekt wird jede Stufe einzeln ausgeschaltet. (Laufrichtung von Stripe-Start nach Stripe-Ende)
-      #
-      # - anzahl             -  muss auf die Anzahl der Stufen angepasst werden
-      # - ledStufe[anzahl]   -  ist ein Array, welches für jede Stufe die jeweilige Anzahl der LEDs beinhaltet.
-      #                         Die Anzahl der in ledStufe enthaltenen Einträge muss der Anzahl der Stufen entsprechen!
       - addressable_lambda:
           name: "Stufenlicht rauf aus"
           update_interval: ${update_intervall}
@@ -653,7 +636,6 @@ light:
               if (stufe == progress && !stufen_beleuchtet[stufe]) {
                 stufen_beleuchtet[stufe] = true;
                 it.range(von, von + id(led_stufen)[stufe]) = Color::random_color();
-                ESP_LOGI("Stufenlicht", "Stufe %d beleuchtet", progress);
               }
               von += id(led_stufen)[stufe];
             }
@@ -664,14 +646,6 @@ light:
 
       # Beim colorized Effekt wird jede Stufe einzeln in einer Festgelegten-Farbe eingeschaltet.  (Laufrichtung von Stripe-Ende nach Stripe-Start)
       # Die Farbauswahl kann für jede Stufe individuell erfolgen
-      #
-      # - anzahl                  -  muss auf die Anzahl der Stufen angepasst werden
-      # - ledStufe[anzahl]        -  ist ein Array, welches für jede Stufe die jeweilige Anzahl der LEDs beinhaltet.
-      #                              Die Anzahl der in ledStufe enthaltenen Einträge muss der Anzahl der Stufen entsprechen!
-      # - ledStufenFarbe[anzahl]  -  ist ein Array, welches für jede Stufe die jeweilige Farbe beinhaltet.
-      #                              Die Anzahl der in ledStufenFarbe enthaltenen Einträge muss der Anzahl der Stufen entsprechen!
-      #                              Die Farben sind in der Form "Color(rot, grün, blau)" anzugeben, 
-      #                              wobei hier für rot, grün und blau jeweils eine Zahl zwischen 0 und 255 angegeben werden muss.
       - addressable_lambda:
           name: "Stufenlicht runter colorized"
           update_interval: ${update_intervall}
@@ -693,10 +667,6 @@ light:
             }
 
       # Bei diesem Effekt wird jede Stufe einzeln weiss geschaltet. (Laufrichtung von Stripe-Ende nach Stripe-Start)
-      #
-      # - anzahl             -  muss auf die Anzahl der Stufen angepasst werden
-      # - ledStufe[anzahl]   -  ist ein Array, welches für jede Stufe die jeweilige Anzahl der LEDs beinhaltet.
-      #                         Die Anzahl der in ledStufe enthaltenen Einträge muss der Anzahl der Stufen entsprechen!
       - addressable_lambda:
           name: "Stufenlicht runter weiss"
           update_interval: ${update_intervall}
@@ -718,10 +688,6 @@ light:
             }
 
       # Bei diesem Effekt wird jede Stufe einzeln ausgeschaltet. (Laufrichtung von Stripe-Ende nach Stripe-Start)
-      #
-      # - anzahl             -  muss auf die Anzahl der Stufen angepasst werden
-      # - ledStufe[anzahl]   -  ist ein Array, welches für jede Stufe die jeweilige Anzahl der LEDs beinhaltet.
-      #                         Die Anzahl der in ledStufe enthaltenen Einträge muss der Anzahl der Stufen entsprechen!
       - addressable_lambda:
           name: "Stufenlicht runter aus"
           update_interval: ${update_intervall}

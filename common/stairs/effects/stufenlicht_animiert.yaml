@@ -22,7 +22,6 @@
         if (stufe == progress && !stufen_beleuchtet[stufe]) {
           stufen_beleuchtet[stufe] = true;
           it.range(von, von + id(led_stufen)[stufe]) = Color::random_color();
-          ESP_LOGI("Stufenlicht", "Stufe %d beleuchtet", progress);
         }
         von += id(led_stufen)[stufe];
       }
@@ -55,7 +54,6 @@
         if (stufe == progress && !stufen_beleuchtet[stufe]) {
           stufen_beleuchtet[stufe] = true;
           it.range(von, von + id(led_stufen)[stufe]) = Color::random_color();
-          ESP_LOGI("Stufenlicht", "Stufe %d beleuchtet", progress);
         }
         von += id(led_stufen)[stufe];
       }
